@@ -6,7 +6,6 @@ sudo mkdir -p $SETUP_DIR
 # Переменные
 WIREGUARD_SETUP_DIR="$SETUP_DIR/wireguard"
 DOCKER_SETUP_DIR="$SETUP_DIR/docker"
-GITLAB_SETUP_DIR="$SETUP_DIR/docker"
 
 
 LOGFILE="$SETUP_DIR/setup.log"
@@ -144,6 +143,8 @@ sudo apt-get update
 
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+sudo mkdir -p $DOCKER_SETUP_DIR
+
 echo "Установка и настройка Docker завершены."
 
 
@@ -151,20 +152,28 @@ echo "Установка и настройка Docker завершены."
 #-----gitlab-----#
 echo "Устанавливаем Gitlab..."
 
-sudo mkdir -p $GITLAB_DIR
-export GITLAB_HOME=$GITLAB_DIR
+tee $DOCKER_SETUP_DIR/gitlab.yml <<EOF
+version: '3.6'
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://10.0.0.1:$GITLAB_HTTP_PORT';
+        gitlab_rails['gitlab_shell_ssh_port'] = $GITLAB_SSH_PORT
+    ports:
+      - '$GITLAB_HTTP_PORT:80'
+      - '$GITLAB_SSH_PORT:22'
+    volumes:
+      - '$GITLAB_DIR/config:/etc/gitlab'
+      - '$GITLAB_DIR/logs:/var/log/gitlab'
+      - '$GITLAB_DIR/data:/var/opt/gitlab'
+    shm_size: '256m'
+EOF
 
-sudo docker run --detach \
-  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://10.0.0.1:$GITLAB_HTTP_PORT'; gitlab_rails['gitlab_shell_ssh_port'] = $GITLAB_SSH_PORT" \
-  --publish $GITLAB_SSH_PORT:22 --publish $GITLAB_HTTP_PORT:80 \
-  --name gitlab \
-  --restart always \
-  --volume $GITLAB_HOME/config:/etc/gitlab \
-  --volume $GITLAB_HOME/logs:/var/log/gitlab \
-  --volume $GITLAB_HOME/data:/var/opt/gitlab \
-  --shm-size 256m \
-  gitlab/gitlab-ce:latest
-
+sudo docker compose -f $DOCKER_SETUP_DIR/gitlab.yml up -d
 echo "Установка и настройка Gitlab завершены."
 
 
@@ -172,8 +181,6 @@ echo "Установка и настройка Gitlab завершены."
 #-----nextcloud-----#
 echo "Устанавливаем Nextcloud..."
 
-echo "Создание docker-compose.yml"
-sudo mkdir -p $DOCKER_SETUP_DIR
 tee $DOCKER_SETUP_DIR/nextcloud.yml <<EOF
 version: '3.9'
 
@@ -219,6 +226,7 @@ volumes:
   redis:
 EOF
 
+sudo docker compose -f $DOCKER_SETUP_DIR/nextcloud.yml up -d
 echo "Установка и настройка Nextcloud завершены."
 
 
