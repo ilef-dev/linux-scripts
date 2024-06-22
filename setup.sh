@@ -172,15 +172,15 @@ services:
     restart: always
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://10.0.0.1:$GITLAB_HTTP_PORT';
-        gitlab_rails['gitlab_shell_ssh_port'] = $GITLAB_SSH_PORT
+        external_url 'http://10.0.0.1:${GITLAB_HTTP_PORT}';
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
     ports:
-      - '$GITLAB_HTTP_PORT:$GITLAB_HTTP_PORT'
-      - '$GITLAB_SSH_PORT:22'
+      - '${GITLAB_HTTP_PORT}:${GITLAB_HTTP_PORT}'
+      - '${GITLAB_SSH_PORT}:22'
     volumes:
-      - '$GITLAB_DIR/config:/etc/gitlab'
-      - '$GITLAB_DIR/logs:/var/log/gitlab'
-      - '$GITLAB_DIR/data:/var/opt/gitlab'
+      - '${GITLAB_DIR}/config:/etc/gitlab'
+      - '${GITLAB_DIR}/logs:/var/log/gitlab'
+      - '${GITLAB_DIR}/data:/var/opt/gitlab'
     shm_size: '256m'
 EOF
 
@@ -201,7 +201,7 @@ services:
     container_name: nextcloud_db
     restart: unless-stopped
     volumes:
-      - $NEXTCLOUD_DIR/db:/var/lib/postgresql/data
+      - ${NEXTCLOUD_DIR}/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=nextcloud
@@ -214,9 +214,9 @@ services:
     container_name: nextcloud_app
     restart: unless-stopped
     ports:
-      - $NEXTCLOUD_PORT:80
+      - ${NEXTCLOUD_PORT}:80
     volumes:
-      - $NEXTCLOUD_DIR/data:/var/www/html
+      - ${NEXTCLOUD_DIR}/data:/var/www/html
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_DB=nextcloud
@@ -238,7 +238,7 @@ services:
     container_name: nextcloud_redis
     restart: unless-stopped
     volumes:
-      - $NEXTCLOUD_DIR/redis:/data
+      - ${NEXTCLOUD_DIR}/redis:/data
     networks:
       - nextcloud_network
 
