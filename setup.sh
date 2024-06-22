@@ -164,7 +164,7 @@ services:
         external_url 'http://10.0.0.1:$GITLAB_HTTP_PORT';
         gitlab_rails['gitlab_shell_ssh_port'] = $GITLAB_SSH_PORT
     ports:
-      - '$GITLAB_HTTP_PORT:80'
+      - '$GITLAB_HTTP_PORT:$GITLAB_HTTP_PORT'
       - '$GITLAB_SSH_PORT:22'
     volumes:
       - '$GITLAB_DIR/config:/etc/gitlab'
