@@ -7,9 +7,11 @@ sudo mkdir -p $SETUP_DIR
 WIREGUARD_SETUP_DIR="$SETUP_DIR/wireguard"
 DOCKER_SETUP_DIR="$SETUP_DIR/docker"
 
-
+# Лог файл
 LOGFILE="$SETUP_DIR/setup.log"
 exec > >(tee -a $LOGFILE) 2>&1
+# Права только для root
+sudo chmod 600 $SETUP_DIR/setup.log
 
 # Проверка прав суперпользователя
 if [ "$(id -u)" -ne 0 ]; then
