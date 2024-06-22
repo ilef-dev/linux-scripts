@@ -40,6 +40,9 @@ prompt_update() {
 # Проверяем обновление пакетов перед продолжением
 prompt_update
 
+# Обновление пакетов
+sudo apt update
+
 
 
 # Заполняем глобальные переменные
@@ -53,12 +56,14 @@ read -p "Введите путь к папке данных nextcloud: " NEXTCLO
 read -p "Введите port для сервера nextcloud: " NEXTCLOUD_PORT
 
 
+
 # Установка часового пояса
 if ! sudo timedatectl set-timezone Europe/Moscow; then
     echo "Ошибка установки часового пояса" >&2
     exit 1
 fi
 echo "Начало установки: $(date)"
+
 
 
 #-----wireguard-----#
