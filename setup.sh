@@ -195,6 +195,8 @@ services:
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=nextcloud
       - POSTGRES_PASSWORD=nextcloud
+    networks:
+      - nextcloud_network
 
   app:
     image: nextcloud:latest
@@ -210,8 +212,15 @@ services:
       - POSTGRES_USER=nextcloud
       - POSTGRES_PASSWORD=nextcloud
       - NEXTCLOUD_TRUSTED_DOMAINS=10.0.0.1
+      - REDIS_HOST=redis
+      - PHP_MEMORY_LIMIT=4G
+      - NEXTCLOUD_ADMIN_USER=admin
+      - NEXTCLOUD_ADMIN_PASSWORD=admin
     depends_on:
       - db
+      - redis
+    networks:
+      - nextcloud_network
 
   redis:
     image: redis:latest
@@ -219,11 +228,13 @@ services:
     restart: unless-stopped
     volumes:
       - $NEXTCLOUD_DIR/redis:/data
+    networks:
+      - nextcloud_network
 
-volumes:
-  db:
-  nextcloud:
-  redis:
+networks:
+  nextcloud_network:
+    driver: bridge
+
 EOF
 
 sudo docker compose -f $DOCKER_SETUP_DIR/nextcloud.yml up -d
