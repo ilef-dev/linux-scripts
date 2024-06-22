@@ -4,8 +4,9 @@ SETUP_DIR="setup"
 sudo mkdir -p $SETUP_DIR
 
 # Переменные
-WG_DIR="$SETUP_DIR/wireguard"
-DOCKER_DIR="$SETUP_DIR/docker"
+WIREGUARD_SETUP_DIR="$SETUP_DIR/wireguard"
+DOCKER_SETUP_DIR="$SETUP_DIR/docker"
+GITLAB_SETUP_DIR="$SETUP_DIR/docker"
 
 
 LOGFILE="$SETUP_DIR/setup.log"
@@ -78,15 +79,15 @@ client_private_key=${client_keys[0]}
 client_public_key=${client_keys[1]}
 
 # Создание директорий
-sudo mkdir -p $WG_DIR
-sudo mkdir -p $WG_DIR/keys
+sudo mkdir -p $WIREGUARD_SETUP_DIR
+sudo mkdir -p $WIREGUARD_SETUP_DIR/keys
 
 # Сохранение ключей
 echo "Сохраняем ключи..."
-sudo tee $WG_DIR/keys/server_private.key <<< "$server_private_key"
-sudo tee $WG_DIR/keys/server_public.key <<< "$server_public_key"
-sudo tee $WG_DIR/keys/client_private.key <<< "$client_private_key"
-sudo tee $WG_DIR/keys/client_public.key <<< "$client_public_key"
+sudo tee $WIREGUARD_SETUP_DIR/keys/server_private.key <<< "$server_private_key"
+sudo tee $WIREGUARD_SETUP_DIR/keys/server_public.key <<< "$server_public_key"
+sudo tee $WIREGUARD_SETUP_DIR/keys/client_private.key <<< "$client_private_key"
+sudo tee $WIREGUARD_SETUP_DIR/keys/client_public.key <<< "$client_public_key"
 
 # Настройка $WG_CONFIG_NAME.conf
 echo "Создаем конфигурацию $WG_CONFIG_NAME.conf для сервера"
@@ -103,7 +104,7 @@ EOF
 
 # Настройка $WG_CONFIG_NAME.conf
 echo "Создаем конфигурацию $WG_CONFIG_NAME.conf для клиента"
-tee $WG_DIR/$WG_CONFIG_NAME.conf <<EOF
+tee $WIREGUARD_SETUP_DIR/$WG_CONFIG_NAME.conf <<EOF
 [Interface]
 PrivateKey = $client_private_key
 Address = 10.0.0.2/32
@@ -120,7 +121,7 @@ sudo systemctl start wg-quick@$WG_CONFIG_NAME
 sudo systemctl enable wg-quick@$WG_CONFIG_NAME
 
 echo "Установка и настройка WireGuard завершены."
-echo "Конфигурация клиента сохранена в $WG_DIR/$WG_CONFIG_NAME.conf"
+echo "Конфигурация клиента сохранена в $WIREGUARD_SETUP_DIR/$WG_CONFIG_NAME.conf"
 
 
 
@@ -154,7 +155,7 @@ sudo mkdir -p $GITLAB_DIR
 export GITLAB_HOME=$GITLAB_DIR
 
 sudo docker run --detach \
-  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://127.0.0.1:$GITLAB_HTTP_PORT'; gitlab_rails['gitlab_shell_ssh_port'] = $GITLAB_SSH_PORT" \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://10.0.0.1:$GITLAB_HTTP_PORT'; gitlab_rails['gitlab_shell_ssh_port'] = $GITLAB_SSH_PORT" \
   --publish $GITLAB_SSH_PORT:22 --publish $GITLAB_HTTP_PORT:80 \
   --name gitlab \
   --restart always \
@@ -172,8 +173,8 @@ echo "Установка и настройка Gitlab завершены."
 echo "Устанавливаем Nextcloud..."
 
 echo "Создание docker-compose.yml"
-sudo mkdir -p $DOCKER_DIR
-tee $DOCKER_DIR/nextcloud.yml <<EOF
+sudo mkdir -p $DOCKER_SETUP_DIR
+tee $DOCKER_SETUP_DIR/nextcloud.yml <<EOF
 version: '3.9'
 
 services:
