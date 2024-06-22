@@ -82,11 +82,11 @@ sudo mkdir -p $WIREGUARD_SETUP_DIR
 sudo mkdir -p $WIREGUARD_SETUP_DIR/keys
 
 # Сохранение ключей
-echo "Сохраняем ключи..."
-sudo tee $WIREGUARD_SETUP_DIR/keys/server_private.key <<< "$server_private_key"
-sudo tee $WIREGUARD_SETUP_DIR/keys/server_public.key <<< "$server_public_key"
-sudo tee $WIREGUARD_SETUP_DIR/keys/client_private.key <<< "$client_private_key"
-sudo tee $WIREGUARD_SETUP_DIR/keys/client_public.key <<< "$client_public_key"
+# echo "Сохраняем ключи..."
+# sudo tee $WIREGUARD_SETUP_DIR/keys/server_private.key <<< "$server_private_key"
+# sudo tee $WIREGUARD_SETUP_DIR/keys/server_public.key <<< "$server_public_key"
+# sudo tee $WIREGUARD_SETUP_DIR/keys/client_private.key <<< "$client_private_key"
+# sudo tee $WIREGUARD_SETUP_DIR/keys/client_public.key <<< "$client_public_key"
 
 # Настройка $WG_CONFIG_NAME.conf
 echo "Создаем конфигурацию $WG_CONFIG_NAME.conf для сервера"
